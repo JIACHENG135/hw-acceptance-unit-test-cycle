@@ -1,7 +1,7 @@
 class MoviesController < ApplicationController
-  
+
   def movie_params
-    params.require(:movie).permit(:title, :rating, :description, :release_date)
+    params.require(:movie).permit(:title, :rating, :description, :release_date, :director)
   end
 
   def show
@@ -9,6 +9,7 @@ class MoviesController < ApplicationController
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
   end
+
 
   def index
     sort = params[:sort] || session[:sort]
@@ -20,11 +21,11 @@ class MoviesController < ApplicationController
     end
     @all_ratings = Movie.all_ratings
     @selected_ratings = params[:ratings] || session[:ratings] || {}
-    
+
     if @selected_ratings == {}
       @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
     end
-    
+
     if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
       session[:sort] = sort
       session[:ratings] = @selected_ratings
@@ -59,6 +60,15 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+  end
+
+  def find_similar_movies
+    @movies = Movie.similar_movies(params[:id].to_i)
+    @movie = Movie.find(params[:id])
+      if @movies.nil? or @movie.director.empty?
+        flash[:warning ] = "'#{@movie.title}' has no director info"
+      redirect_to root_path
+      end
   end
 
 end
