@@ -1,5 +1,4 @@
--# in app/views/movies/show.html.haml
-%h3 Details about #{@movie.title}
+%h2 Details about #{@movie.title}
 
 %ul#details
   %li
@@ -11,8 +10,7 @@
   %li
     Director:
     = @movie.director
-
-%h4 Description:
+%h3 Description:
 
 %p#description= @movie.description
 
